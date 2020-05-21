@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <TimerThree.h>
+#include <DIO2.h>
 #include "DCCWaveform.h"
 #include "DIAG.h"
 
@@ -201,25 +202,19 @@ void DCCWaveform::schedulePacket(const byte buffer[], byte byteCount, byte repea
     packetPending=true;
   }
  
-// ACK stuff is untested!!!!
- bool  DCCWaveform::startAckProcess() {
-  if (sensePin==0) return false; 
-  int base=0;
-  for (int j = 0; j < ACK_BASE_COUNT; j++)
-  {
-    base+= (int)analogRead(sensePin);
-  }
-  ackBaseCurrent=base / ACK_BASE_COUNT;
-  return true; 
-}
+
 
 bool DCCWaveform::getAck()
 {
-  int threshold=ackBaseCurrent+ACK_SAMPLE_THRESHOLD;
+  if (isMainTrack) return false; // cant do this on main track
 
-  for (int j = 0; j < ACK_SAMPLE_COUNT; j++)
-  {
-    if (analogRead(sensePin) > threshold) return true;
+  while(packetPending) delay(1);
+  long timeout=millis()+ACK_TIMEOUT;
+  bool result=false;
+  while(result==false && timeout>millis()) {
+    result=analogRead(sensePin) > ACK_PULSE_CURRENT;
   }
-  return false;
+  if (result) while(analogRead(sensePin)> ACK_PULSE_DEAD_AREA) delay(1);
+  
+  return result;
 }

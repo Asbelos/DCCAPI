@@ -1,4 +1,3 @@
-#include <DIO2.h>
 
 // This hardware configuration would normally be setup in a .h file elsewhere
 const byte MAIN_POWER_PIN=3;
@@ -14,9 +13,11 @@ const int  POWER_SAMPLE_ON_WAIT=100;
 const int  POWER_SAMPLE_OFF_WAIT=1000;
 const int  POWER_SAMPLE_OVERLOAD_WAIT=4000;
 
-const int   ACK_BASE_COUNT  =          100 ;     // number of analogRead samples to take before each CV verify to establish a baseline current
-const int   ACK_SAMPLE_COUNT  =        500 ;     // number of analogRead samples to take when monitoring current after a CV verify (bit or byte) has been sent 
-const int   ACK_SAMPLE_THRESHOLD =      30 ;    // the threshold that the exponentially-smoothed analogRead samples (after subtracting the baseline current) must cross to establish ACKNOWLEDGEMENT
+
+// ACK current analogRead values (vary depending on motor shield and cpu voltage)
+const int   ACK_TIMEOUT = 100 ;  // millis getAck is prepared to wait
+const int   ACK_MAX_NOT_PULSE = 30 ;  // current below which this is NOT a pulse
+const int   ACK_MIN_PULSE = 60 ;   // current above which a pulse is recognised
 
 const int   PREAMBLE_BITS_MAIN=16;
 const int   PREAMBLE_BITS_PROG=22;        
